@@ -1,7 +1,7 @@
 # UnrealEngine.Gvas
 A .NET 6 library that can parse, modify and save Unreal Engine 4 save files (GVAS format). This repository also contains an abstraction layer on top of the Gvas parser to load the save format of [Five Nights at Freddy's: Security Breach](https://store.steampowered.com/app/747660/Five_Nights_at_Freddys_Security_Breach/), and also a small project that can convert save files to `.xml` (but not back to .sav!).
 
-The library was made primarely for the new FNaF game, but it has also been tested on a few other UE4 titles. Games tested so far:
+The library was made primarily for the new FNaF game, but it has also been tested on a few other UE4 titles. Games tested so far:
 - Five Nights at Freddy's: Security Breach
 - Five Nights at Freddy's: Help Wanted
 - Poppy Playtime
