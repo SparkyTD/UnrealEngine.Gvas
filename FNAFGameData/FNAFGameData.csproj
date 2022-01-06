@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\UnrealEngine.Gvas\UnrealEngine.Gvas.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="PlayerSettings" />
+    </ItemGroup>
+
+</Project>

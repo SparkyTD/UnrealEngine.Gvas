@@ -1,0 +1,5 @@
+**/bin/
+**/obj/
+UnrealEngine.LocRes/
+UnrealEngine.LocRes.Test/
+UnrealEngine.Gvas.Test/
