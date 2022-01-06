@@ -8,6 +8,8 @@ The library was made primarely for the new FNaF game, but it has also been teste
 - Tetris Effect
 - The Turing Test
 
+If you find a new UE4 game that this library can't parse, please open a new Issue and attach your .sav file!
+
 ## Example Usage
 ```c#
 const string fileName = @"C:\Users\Sparky\AppData\Local\fnaf9\Saved\SaveGames\SaveGameSlot0.sav";
