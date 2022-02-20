@@ -11,7 +11,7 @@ public class SaveGameFile
     public static SaveGameFile LoadFrom(string path)
     {
         var fileStream = File.OpenRead(path);
-        var reader = new BinaryReader(fileStream);
+        var reader = new DebugBinaryReader(fileStream);
 
         var saveGameFile = new SaveGameFile();
         saveGameFile.Header = SaveGameHeader.ReadFrom(reader);

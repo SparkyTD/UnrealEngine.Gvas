@@ -1,5 +1,6 @@
 namespace UnrealEngine.Gvas.FProperties;
 
+[OptionalGuid]
 public class FObjectProperty : FProperty
 {
     public string? ObjectName { get; set; }

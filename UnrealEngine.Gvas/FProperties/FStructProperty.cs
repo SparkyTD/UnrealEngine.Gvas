@@ -30,6 +30,13 @@ public class FStructProperty : FProperty
             Fields.Add("Yaw", new FFloatProperty {Name = "Yaw", Value = reader.ReadSingle()});
             Fields.Add("Roll", new FFloatProperty {Name = "Roll", Value = reader.ReadSingle()});
         }
+        else if (TypeName == "Quat")
+        {
+            Fields.Add("X", new FFloatProperty {Name = "X", Value = reader.ReadSingle()});
+            Fields.Add("Y", new FFloatProperty {Name = "Y", Value = reader.ReadSingle()});
+            Fields.Add("Z", new FFloatProperty {Name = "Z", Value = reader.ReadSingle()});
+            Fields.Add("W", new FFloatProperty {Name = "W", Value = reader.ReadSingle()});
+        }
         else if (TypeName == "DateTime")
             Fields.Add("Ticks", new FInt64Property {Name = "Ticks", Value = reader.ReadInt64()});
         else if (TypeName == "IntPoint")

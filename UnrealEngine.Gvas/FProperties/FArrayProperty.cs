@@ -61,6 +61,24 @@ public class FArrayProperty : FProperty
                 Elements.Add(elementInstance);
             }
         }
+        else if (ElementType == "StrProperty")
+        {
+            for (int i = 0; i < elementCount; i++)
+            {
+                var elementInstance = new FStrProperty();
+                elementInstance.Read(reader, propertyName, 0, true);
+                Elements.Add(elementInstance);
+            }
+        }
+        else if (ElementType == "ObjectProperty")
+        {
+            for (int i = 0; i < elementCount; i++)
+            {
+                var elementInstance = new FObjectProperty();
+                elementInstance.Read(reader, propertyName, 0, true);
+                Elements.Add(elementInstance);
+            }
+        }
         else
             throw new SaveGameException($"Unsupported {nameof(FArrayProperty)} type: '{ElementType}'");
     }
@@ -78,7 +96,7 @@ public class FArrayProperty : FProperty
             foreach (var property in Elements)
                 property.WriteTo(writer, i++ == 0);
         } 
-        else if (ElementType is "IntProperty" or "BoolProperty" or "ByteProperty" or "NameProperty")
+        else if (ElementType is "IntProperty" or "BoolProperty" or "ByteProperty" or "NameProperty" or "StrProperty")
         {
             foreach (var property in Elements)
                 property.WriteTo(writer, false);

@@ -8,7 +8,7 @@ public static class BinaryReaderEx
     public static string? ReadFString(this BinaryReader reader)
     {
         int length = reader.ReadInt32();
-        if (length is > 128 or < 0)
+        if (length is > 512 or < 0)
             throw new SaveGameException($"Sanity check failed: FString length is {length}");
 
         return Encoding.ASCII.GetString(reader.ReadBytes(length)).TrimEnd('\0');
