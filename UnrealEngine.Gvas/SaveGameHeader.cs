@@ -13,6 +13,7 @@ public class SaveGameHeader
     public CustomVersionSerializationFormat CustomVersionFormat { get; set; }
     public List<CustomVersion> CustomVersions { get; set; } = new();
     public string? SaveGameClassName { get; set; }
+    public long Unknown1 { get; set; }
 
     public static SaveGameHeader ReadFrom(BinaryReader reader)
     {
@@ -20,15 +21,19 @@ public class SaveGameHeader
         if (!magic.SequenceEqual(FileTypeTag))
             throw new SaveGameException("Invalid magic number in file header, expected: 'GVAS'.");
 
-        return new SaveGameHeader
+        var header = new SaveGameHeader
         {
             SaveGameFileVersion = reader.ReadInt32(),
             PackageFileUE4Version = reader.ReadInt32(),
             SavedEngineVersion = EngineVersion.ReadFrom(reader),
             CustomVersionFormat = (CustomVersionSerializationFormat) reader.ReadInt32(),
             CustomVersions = Enumerable.Range(0, reader.ReadInt32()).Select(_ => CustomVersion.ReadFrom(reader)).ToList(),
-            SaveGameClassName = reader.ReadFString()
+            SaveGameClassName = reader.ReadFString(),
+            Unknown1 = 0
         };
+        if (header.SaveGameFileVersion >= 3)
+            header.Unknown1 = reader.ReadInt64();
+        return header;
     }
 
     public void WriteTo(BinaryWriter writer)
@@ -42,5 +47,7 @@ public class SaveGameHeader
         foreach (var customVersion in CustomVersions)
             customVersion.WriteTo(writer);
         writer.WriteFString(SaveGameClassName);
+        if (SaveGameFileVersion >= 3)
+            writer.Write(Unknown1);
     }
 }
