@@ -21,7 +21,7 @@ public static class Program
 
         string targetFile = Path.Combine(Path.GetDirectoryName(sourceFile)!, Path.GetFileNameWithoutExtension(sourceFile) + ".xml");
         if (args.Length >= 2)
-            targetFile = args[2];
+            targetFile = args[1];
 
         var saveData = SaveGameFile.LoadFrom(sourceFile);
         File.WriteAllText(targetFile, saveData.Serialize().ToString());
