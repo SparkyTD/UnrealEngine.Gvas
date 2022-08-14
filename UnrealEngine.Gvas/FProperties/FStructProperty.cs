@@ -44,6 +44,16 @@ public class FStructProperty : FProperty
             Fields.Add("X", new FIntProperty {Name = "X", Value = reader.ReadInt32()});
             Fields.Add("Y", new FIntProperty {Name = "Y", Value = reader.ReadInt32()});
         }
+        else if (TypeName == "Guid")
+        {
+          if (!bodyOnly)
+          {
+            Fields.Add("A", new FIntProperty {Name = "A", Value = reader.ReadInt32()});
+            Fields.Add("B", new FIntProperty {Name = "B", Value = reader.ReadInt32()});
+            Fields.Add("C", new FIntProperty {Name = "C", Value = reader.ReadInt32()});
+            Fields.Add("D", new FIntProperty {Name = "D", Value = reader.ReadInt32()});
+          }
+        }
         else
         {
             FProperty? field;
@@ -85,6 +95,13 @@ public class FStructProperty : FProperty
         {
             writer.Write((Fields["X"] as FIntProperty)!.Value);
             writer.Write((Fields["Y"] as FIntProperty)!.Value);
+        }
+        else if (TypeName == "Guid")
+        {
+            writer.Write((Fields["A"] as FIntProperty)!.Value);
+            writer.Write((Fields["B"] as FIntProperty)!.Value);
+            writer.Write((Fields["C"] as FIntProperty)!.Value);
+            writer.Write((Fields["D"] as FIntProperty)!.Value);
         }
         else
         {
