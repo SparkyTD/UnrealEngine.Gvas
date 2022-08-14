@@ -12,10 +12,16 @@ public class FByteProperty : FProperty
 
     internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, bool bodyOnly = false)
     {
-        EnumName = reader.ReadFString();
         if (!bodyOnly)
+        {
+            EnumName = reader.ReadFString();
             reader.ReadByte(); // 0x00 separator
-        Payload = reader.ReadBytes((int) fieldLength);
+            Payload = reader.ReadBytes((int) fieldLength);
+        }
+        else
+        {
+          Payload = reader.ReadBytes(1);
+        }
 
         if (Payload.Length > 4 && BitConverter.ToInt32(Payload, 0) == Payload.Length - 4)
             TextPayload = Encoding.ASCII.GetString(Payload.Skip(4).ToArray());
@@ -23,9 +29,11 @@ public class FByteProperty : FProperty
 
     internal override void Write(BinaryWriter writer, bool skipHeader)
     {
-        writer.WriteFString(EnumName);
         if (!skipHeader)
+        {
+            writer.WriteFString(EnumName);
             writer.Write((byte) 0);
+        }
         writer.Write(Payload!);
     }
 
