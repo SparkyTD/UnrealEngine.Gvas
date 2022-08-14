@@ -85,11 +85,12 @@ public class FStructProperty : FProperty
             writer.Write((Fields["Yaw"] as FFloatProperty)!.Value);
             writer.Write((Fields["Roll"] as FFloatProperty)!.Value);
         }
-        else if (TypeName == "Vector")
+        else if (TypeName == "Quat")
         {
             writer.Write((Fields["X"] as FFloatProperty)!.Value);
             writer.Write((Fields["Y"] as FFloatProperty)!.Value);
             writer.Write((Fields["Z"] as FFloatProperty)!.Value);
+            writer.Write((Fields["W"] as FFloatProperty)!.Value);
         }
         else if (TypeName == "DateTime")
             writer.Write((Fields["Ticks"] as FInt64Property)!.Value);
