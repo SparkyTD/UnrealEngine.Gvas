@@ -16,6 +16,8 @@ public class FStructProperty : FProperty
             TypeName = reader.ReadFString();
             structureGuid = new Guid(reader.ReadBytes(16));
             reader.ReadBytes(1);
+            if (fieldLength == 0)
+              return;
         }
 
         if (TypeName == "Vector")
