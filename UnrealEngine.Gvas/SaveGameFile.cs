@@ -1,4 +1,6 @@
+using System.IO.Compression;
 using System.Xml.Linq;
+using UnrealEngine.Gvas.Exceptions;
 using UnrealEngine.Gvas.FProperties;
 
 namespace UnrealEngine.Gvas;
@@ -7,24 +9,75 @@ public class SaveGameFile
 {
     public SaveGameHeader? Header { get; set; }
     public FStructProperty? Root { get; set; }
-
-    public static SaveGameFile LoadFrom(string path)
+    public GvasCompressionMethod CompressionMethod { get; set; }
+    
+    public static SaveGameFile LoadFrom(string path, Dictionary<string, string>? typeHints = null)
     {
-        var fileStream = File.OpenRead(path);
-        var reader = new DebugBinaryReader(fileStream);
+        using var fileStream = File.OpenRead(path);
+        return Load(fileStream, typeHints);
+    }
 
-        var saveGameFile = new SaveGameFile();
-        saveGameFile.Header = SaveGameHeader.ReadFrom(reader);
+    public static SaveGameFile Load(Stream stream, Dictionary<string, string>? typeHints = null)
+    {
+        var reader = GetUnrealBinaryReader(stream, out var compressionMethod);
+
+        var saveGameFile = new SaveGameFile
+        {
+            Header = SaveGameHeader.ReadFrom(reader),
+            CompressionMethod = compressionMethod
+        };
+
+        Console.Out.WriteLine(saveGameFile.Header);
 
         var root = new FStructProperty();
         FProperty property;
-        while ((property = FProperty.ReadFrom(reader).First()) != FProperty.NoneProperty)
+        int i = -1;
+        while (i++ > int.MinValue && (property = FProperty.ReadFrom(reader, string.Empty, typeHints: typeHints).First()) != FProperty.NoneProperty)
             root.Fields.Add(property.Name!, property);
         saveGameFile.Root = root;
-        
-        fileStream.Close();
 
         return saveGameFile;
+    }
+
+    private static BinaryReader GetUnrealBinaryReader(Stream inputStream, out GvasCompressionMethod compressionMethod)
+    {
+        if (inputStream.Length < 12)
+            throw new SaveGameException("Not enough bytes in file, likely not a valid Gvas file");
+
+        var tempBinaryReader = new BinaryReader(inputStream);
+        var unrealHeader = tempBinaryReader.ReadUInt32();
+        if (unrealHeader == 0x53415647) // GVAS, Uncompressed
+        {
+            inputStream.Seek(0, SeekOrigin.Begin);
+            compressionMethod = GvasCompressionMethod.Uncompressed;
+            return tempBinaryReader;
+        }
+
+        var compressedLength = tempBinaryReader.ReadInt32();
+        var compressionMode = tempBinaryReader.ReadUInt32();
+
+        if (compressionMode != 0x315A6C50 && compressionMode != 0x325A6C50)
+            throw new SaveGameException("Unknown or invalid Gvas compression header");
+
+        var decompressionStream = GetDecompressStream(inputStream);
+        
+        if (compressionMode == 0x325A6C50 && compressedLength != decompressionStream.Length)
+            throw new SaveGameException("The compressed length in the header doesn't match the file's actual size");
+        
+        if (compressionMode == 0x325A6C50)
+            decompressionStream = GetDecompressStream(decompressionStream);
+
+        compressionMethod = compressionMode == 0x325A6C50 ? GvasCompressionMethod.DoubleZLib : GvasCompressionMethod.SingleZLib;
+        return new BinaryReader(decompressionStream);
+    }
+
+    private static Stream GetDecompressStream(Stream stream)
+    {
+        using var decompressStream = new ZLibStream(stream, CompressionMode.Decompress, false);
+        var targetStream = new MemoryStream();
+        decompressStream.CopyTo(targetStream);
+        targetStream.Seek(0, SeekOrigin.Begin);
+        return targetStream;
     }
 
     public void Save(string path)

@@ -10,7 +10,7 @@ public class FTextProperty : FProperty
     public int Unknown1 { get; set; }
     public byte Flags { get; set; }
     
-    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, bool bodyOnly = false)
+    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, string path, string? typeNameHint = null, bool bodyOnly = false, Dictionary<string, string>? typeHints = null)
     {
         long startPos = reader.BaseStream.Position;
         Unknown1 = reader.ReadInt32();

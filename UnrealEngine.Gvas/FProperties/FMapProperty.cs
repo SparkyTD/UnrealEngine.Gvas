@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Xml.Linq;
 using UnrealEngine.Gvas.Exceptions;
 
@@ -9,7 +10,7 @@ public class FMapProperty : FProperty
     public Type? ValueType { get; private set; }
     public Dictionary<FProperty, FProperty> KeyValuePairs { get; } = new();
 
-    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, bool bodyOnly = false)
+    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, string path, string? typeNameHint = null, bool bodyOnly = false, Dictionary<string, string>? typeHints = null)
     {
         var keyTypeName = reader.ReadFString();
         var valueTypeName = reader.ReadFString();
@@ -22,17 +23,24 @@ public class FMapProperty : FProperty
         if (ValueType == null)
             throw new SaveGameException($"The {nameof(FMapProperty)}'s key type cannot be null.");
 
-        reader.ReadBytes(5);
+        var temp = reader.ReadBytes(5);
         int elementCount = reader.ReadInt32();
         for (int i = 0; i < elementCount; i++)
         {
             var keyInstance = InstantiateType(KeyType);
             var valueInstance = InstantiateType(ValueType);
 
-            // TODO handle if value is Struct
+            var keyPath = $"{path}.Key";
+            var valuePath = $"{path}.Value";
 
-            keyInstance.Read(reader, null, 0);
-            valueInstance.Read(reader, null, 0, true);
+            var keyTypeHint = "Guid";
+            var valueTypeHint = "StructProperty";
+
+            typeHints?.TryGetValue(keyPath, out keyTypeHint);
+            typeHints?.TryGetValue(valuePath, out valueTypeHint);
+
+            keyInstance.Read(reader, null, 0, keyPath, keyTypeHint, true, typeHints: typeHints);
+            valueInstance.Read(reader, null, 0, valuePath, valueTypeHint, true, typeHints: typeHints);
 
             KeyValuePairs.Add(keyInstance, valueInstance);
         }

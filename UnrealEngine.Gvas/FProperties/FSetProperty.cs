@@ -7,7 +7,7 @@ public class FSetProperty : FProperty
     public string? ElementType { get; set; }
     public List<FProperty> Elements { get; } = new();
 
-    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, bool bodyOnly = false)
+    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, string path, string? typeNameHint = null, bool bodyOnly = false, Dictionary<string, string>? typeHints = null)
     {
         ElementType = reader.ReadFString();
         var elementType = FindPropertyTypeByName(ElementType);
@@ -20,7 +20,7 @@ public class FSetProperty : FProperty
         for (int i = 0; i < elementCount; i++)
         {
             var elementInstance = InstantiateType(elementType);
-            elementInstance.Read(reader, null, 0);
+            elementInstance.Read(reader, null, 0, path);
             Elements.Add(elementInstance);
         }
     }

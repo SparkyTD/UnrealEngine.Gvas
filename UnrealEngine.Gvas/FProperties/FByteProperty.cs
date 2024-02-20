@@ -10,7 +10,7 @@ public class FByteProperty : FProperty
 
     public string? TextPayload { get; set; }
 
-    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, bool bodyOnly = false)
+    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, string path, string? typeNameHint = null, bool bodyOnly = false, Dictionary<string, string>? typeHints = null)
     {
         if (!bodyOnly)
         {

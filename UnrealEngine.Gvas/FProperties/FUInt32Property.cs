@@ -5,7 +5,7 @@ public class FUInt32Property : FProperty
 {
     public uint Value { get; set; }
 
-    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, bool bodyOnly = false)
+    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, string path, string? typeNameHint = null, bool bodyOnly = false, Dictionary<string, string>? typeHints = null)
     {
         Value = reader.ReadUInt32();
     }

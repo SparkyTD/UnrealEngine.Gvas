@@ -7,7 +7,7 @@ public class FArrayProperty : FProperty
     public string? ElementType { get; set; }
     public List<FProperty> Elements { get; } = new();
 
-    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, bool bodyOnly = false)
+    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, string path, string? typeNameHint = null, bool bodyOnly = false, Dictionary<string, string>? typeHints = null)
     {
         ElementType = reader.ReadFString();
         var elementType = FindPropertyTypeByName(ElementType);
@@ -19,7 +19,7 @@ public class FArrayProperty : FProperty
 
         if (ElementType == "StructProperty")
         {
-            var structProperties = ReadFrom(reader, elementCount).Cast<FStructProperty>().ToList();
+            var structProperties = ReadFrom(reader, path, elementCount).Cast<FStructProperty>().ToList();
             Elements.AddRange(structProperties);
 
             foreach (var structProperty in structProperties)
@@ -30,7 +30,7 @@ public class FArrayProperty : FProperty
             for (int i = 0; i < elementCount; i++)
             {
                 var elementInstance = new FNameProperty();
-                elementInstance.Read(reader, propertyName, 0);
+                elementInstance.Read(reader, propertyName, 0, path);
                 Elements.Add(elementInstance);
             }
         }
@@ -39,7 +39,7 @@ public class FArrayProperty : FProperty
             for (int i = 0; i < elementCount; i++)
             {
                 var elementInstance = new FIntProperty();
-                elementInstance.Read(reader, propertyName, 0);
+                elementInstance.Read(reader, propertyName, 0, path);
                 Elements.Add(elementInstance);
             }
         }
@@ -48,7 +48,7 @@ public class FArrayProperty : FProperty
             for (int i = 0; i < elementCount; i++)
             {
                 var elementInstance = new FBoolProperty();
-                elementInstance.Read(reader, propertyName, 0, true);
+                elementInstance.Read(reader, propertyName, 0, path, null, true);
                 Elements.Add(elementInstance);
             }
         }
@@ -57,7 +57,7 @@ public class FArrayProperty : FProperty
             for (int i = 0; i < elementCount; i++)
             {
                 var elementInstance = new FByteProperty();
-                elementInstance.Read(reader, propertyName, 0, true);
+                elementInstance.Read(reader, propertyName, 0, path, null, true);
                 Elements.Add(elementInstance);
             }
         }
@@ -66,7 +66,7 @@ public class FArrayProperty : FProperty
             for (int i = 0; i < elementCount; i++)
             {
                 var elementInstance = new FStrProperty();
-                elementInstance.Read(reader, propertyName, 0, true);
+                elementInstance.Read(reader, propertyName, 0, path, null, true);
                 Elements.Add(elementInstance);
             }
         }
@@ -75,7 +75,7 @@ public class FArrayProperty : FProperty
             for (int i = 0; i < elementCount; i++)
             {
                 var elementInstance = new FObjectProperty();
-                elementInstance.Read(reader, propertyName, 0, true);
+                elementInstance.Read(reader, propertyName, 0, path, null, true);
                 Elements.Add(elementInstance);
             }
         }
@@ -84,7 +84,7 @@ public class FArrayProperty : FProperty
             for (int i = 0; i < elementCount; i++)
             {
                 var elementInstance = new FFloatProperty();
-                elementInstance.Read(reader, propertyName, 0, true);
+                elementInstance.Read(reader, propertyName, 0, path, null, true);
                 Elements.Add(elementInstance);
             }
         }

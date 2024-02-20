@@ -3,9 +3,10 @@ namespace UnrealEngine.Gvas.FProperties;
 [OptionalGuid]
 public class FFloatProperty : FProperty
 {
-    public float Value { get; set; }
+    public double Value { get; set; }
+    public bool IsDouble { get; set; }
 
-    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, bool bodyOnly = false)
+    internal override void Read(BinaryReader reader, string? propertyName, long fieldLength, string path, string? typeNameHint = null, bool bodyOnly = false, Dictionary<string, string>? typeHints = null)
     {
         Value = reader.ReadSingle();
     }
@@ -22,5 +23,5 @@ public class FFloatProperty : FProperty
     
     public override object? AsPrimitive() => Value;
     
-    public override void SetValue(object? val) => Value = (float) val;
+    public override void SetValue(object? val) => Value = (double) val!;
 }

@@ -1,6 +1,6 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Xml.Linq;
-using Microsoft.VisualBasic.CompilerServices;
 using UnrealEngine.Gvas.Exceptions;
 
 namespace UnrealEngine.Gvas.FProperties;
@@ -10,6 +10,7 @@ public abstract class FProperty
     private static readonly Dictionary<string, Type> PropertyTypes = new();
     public static readonly FProperty NoneProperty = new FNoneProperty();
 
+    public string Path { get; set; } = string.Empty;
     public string? Name { get; set; }
     public long FieldLength { get; set; }
     public Guid? Guid { get; set; }
@@ -23,7 +24,7 @@ public abstract class FProperty
             PropertyTypes.Add(propertyType.Name.Remove(0, 1), propertyType);
     }
 
-    public static IEnumerable<FProperty> ReadFrom(BinaryReader reader, int count = -1)
+    public static IEnumerable<FProperty> ReadFrom(BinaryReader reader, string path, int count = -1, Dictionary<string, string>? typeHints = null)
     {
         var propertyName = reader.ReadFString();
         if (propertyName!.TrimStart('\0') == "None")
@@ -31,6 +32,10 @@ public abstract class FProperty
 
         var propertyTypeName = reader.ReadFString()!;
         var fieldLength = reader.ReadInt64();
+
+        // Console.Out.WriteLine($"     | {propertyName} {PropertyTypes} [{fieldLength}]");
+        if(propertyName == "SpawnerDataMapByLevelObjectInstanceId")
+            Debugger.Break();
 
         var propertyType = FindPropertyTypeByName(propertyTypeName)!;
         if (propertyType == null)
@@ -41,6 +46,7 @@ public abstract class FProperty
             var propertyInstance = (FProperty) Activator.CreateInstance(propertyType)!;
             propertyInstance.Name = propertyName;
             propertyInstance.FieldLength = fieldLength;
+            propertyInstance.Path = $"{path}.{propertyInstance.Name}";
 
             if (propertyType.GetCustomAttribute<OptionalGuidAttribute>() != null)
             {
@@ -49,7 +55,7 @@ public abstract class FProperty
                     propertyInstance.Guid = new Guid(reader.ReadBytes(16));
             }
 
-            propertyInstance.Read(reader, propertyName, fieldLength, count != -1 && i != 0);
+            propertyInstance.Read(reader, propertyName, fieldLength, propertyInstance.Path, null, count != -1 && i != 0, typeHints: typeHints);
             yield return propertyInstance;
         }
     }
@@ -75,7 +81,7 @@ public abstract class FProperty
         Write(writer, !writeHeader);
     }
 
-    internal abstract void Read(BinaryReader reader, string? propertyName, long fieldLength, bool bodyOnly = false);
+    internal abstract void Read(BinaryReader reader, string? propertyName, long fieldLength, string path, string? typeNameHint = null, bool bodyOnly = false, Dictionary<string, string>? typeHints = null);
 
     internal virtual void Write(BinaryWriter writer, bool skipHeader)
     {
